@@ -86,7 +86,7 @@ module.exports = class {
      }
     // 上传过了吗
     async handleVerifyUpload () {
-
+        
     }   
 
     async deleteFiles () {

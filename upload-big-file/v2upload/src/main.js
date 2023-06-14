@@ -3,7 +3,7 @@ import App from './App.vue'
 import {
   Button,
   Progress, // 展示文件上传的进度
-  Table 
+  Table
 } from 'element-ui'
 
 import 'element-ui/lib/theme-chalk/index.css';
@@ -14,7 +14,6 @@ Vue
   .use(Button)
   .use(Progress)
   .use(Table)
-
 new Vue({
   render: h => h(App),
 }).$mount('#app')

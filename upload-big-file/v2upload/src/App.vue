@@ -8,10 +8,18 @@
         >
         <el-button @click="handleUpload" :disabled="uploadDisabled">upload</el-button>
     </div>
+    <div>
+      <div>
+        caculate chunk hash
+      </div>
+      <el-progress :percentage="hashPercentage"></el-progress>
+    </div>
   </div>
 </template>
 
 <script>
+// import { resolve } from 'path';
+
 const SIZE = 10 * 1024 * 1024;
 const Status = {
   wait: "wait",
@@ -28,7 +36,10 @@ export default (await import ('vue')).defineComponent({
     container: {
       file: null
     },
+    data: [], // 切片上传数据数组
     // xhr 列表
+    requestList: [],
+    hashPercentage: 0 // hash 计算进度
   }),
   computed: {
     uploadDisabled () {
@@ -51,13 +62,38 @@ export default (await import ('vue')).defineComponent({
       this.requestList = [];
       
     },
-    handleUpload () {
+
+    async handleUpload () {
       if (!this.container.file) return 
+
       this.status = Status.uploading;
 
       const fileChunkList = this.createFileChunk(this.container.file);
       console.log(fileChunkList);
-      
+      // 耗时计算任务
+      this.container.hash = await this.caculateHash(fileChunkList)
+      // map 转变为 请求前的状态
+      this.data = fileChunkList.map(({ file }, index)=> ({
+          fileHash: this.container.hash + "-" + index,
+          index,
+          chunk: file.size,
+          percentage: 0
+      })) 
+    },
+    caculateHash (fileChunkList) {
+      // 主线程 -> woker 线程
+      return new Promise (resolve => {
+        
+        this.container.worker = new Worker("/hash.js")
+        this.container.worker.postMessage({ fileChunkList });
+        this.container.worker.onmessage = e => {
+          const { percentage, hash } = e.data;
+          this.hashPercentage = percentage;
+          if (hash) {
+            resolve(hash)
+          }
+        }
+      })
     },
     createFileChunk (file, size = SIZE) {
       const fileChunkList = [];
