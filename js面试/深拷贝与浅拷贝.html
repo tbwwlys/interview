@@ -24,15 +24,17 @@
             // 判断source 是 数组还是对象
             const targetObj = source.constructor === Array ? [] : {}
             for (let keys in source) {
-                // source 的属性 是 数组或对象则 进入递归再次执行一次 deepClone
-                if (source[keys] && typeof source[keys] === 'object') {
-                    // 判断source[keys] 是数组还是对象
-                    targetObj[keys] = source[keys].constructor === Array ? [] : {};
-                    targetObj[keys] = deepClone(source[keys])
-                } else {
-                    // 如果是常数 就直接赋值
-                    targetObj[keys] = source[keys]
-                }
+                if (source.hasOwnProperty(keys)) {
+                    // source 的属性 是 数组或对象则 进入递归再次执行一次 deepClone
+                    if (source[keys] && typeof source[keys] === 'object') {
+                        // 判断source[keys] 是数组还是对象
+                        targetObj[keys] = source[keys].constructor === Array ? [] : {};
+                        targetObj[keys] = deepClone(source[keys])
+                    } else {
+                        // 如果是常数 就直接赋值
+                        targetObj[keys] = source[keys]
+                    }
+                } 
             }
             return targetObj;
         }
