@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    1. 数组 与 对象的赋值就叫做浅拷贝  简单数据类型是赋值
+    2. 解构赋值是深拷贝还是浅拷贝
+        针对一维数组是深拷贝 但是对于 多维数组是浅拷贝
+    3. 多维深拷贝
+    <script>
+
+        const arr = [1, 2, 3]
+        const arr1 = [...arr]
+        arr1[1] = 8;
+        console.log(arr)
+        console.log(arr1)
+        // 多维深拷贝
+        arr1 = JSON.parse(JSON.stringify(arr))
+        function deepClone (source) {
+            // 判断source 是 数组还是对象
+            const targetObj = source.constructor === Array ? [] : {}
+            for (let keys in source) {
+                if (source.hasOwnProperty(keys)) {
+                    // source 的属性 是 数组或对象则 进入递归再次执行一次 deepClone
+                    if (source[keys] && typeof source[keys] === 'object') {
+                        // 判断source[keys] 是数组还是对象
+                        targetObj[keys] = source[keys].constructor === Array ? [] : {};
+                        targetObj[keys] = deepClone(source[keys])
+                    } else {
+                        // 如果是常数 就直接赋值
+                        targetObj[keys] = source[keys]
+                    }
+                } 
+            }
+            return targetObj;
+        }
+        let obj = {
+            i: 1,
+            a: '我是大聪明',
+            arr: [
+                1,
+                2,
+                3
+            ],
+            o: {
+                b: '我是小聪明'
+            },
+            f: () => {
+                console.log('你怎么回事')
+            }
+        }
+        newObj = deepClone(obj)   
+        console.log(newObj)
+        newObj.i = 9;
+        newObj.arr[0] = 8;
+        newObj.o.b = '我是大混蛋'
+        console.log(newObj)
+        console.log(obj)
+        obj.f()
+        newObj.f()
+    </script>
+</body>
+</html>
